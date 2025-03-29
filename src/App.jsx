@@ -74,7 +74,7 @@ function App() {
     <div className="h-screen flex flex-col justify-around items-center font-bold uppercase overflow-hidden">
       <div className="flex justify-between w-full px-4 items-center relative">
         <h1 className="text-2xl text-center">WORDLE</h1>
-        <img onClick={()=>{setHTP(!HTP)}} className="bg-black rounded-full p-1" src={HTP?"./src/assets/x.svg":"./src/assets/info.svg"} alt="i" />
+        <img onClick={()=>{setHTP(!HTP)}} className="bg-black rounded-full p-1" src={HTP?"./x.svg":"./info.svg"} alt="i" />
         <div className={`htp ${HTP ? "block" : "hidden"} w-5/6 lg:w-1/2 absolute right-5 top-12 bg-white rounded-lg shadow-lg shadow-gray-400`}>
           <Info/>
         </div>
