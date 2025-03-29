@@ -108,7 +108,7 @@ function App() {
           );
         })}
       </div>
-      {hintWords}
+  
       <div className="flex gap-2">
         <button
           className="px-2 py-1 border-2 border-black bg-gray-800 cursor-pointer w-[35vw] text-white font-semibold text-lg rounded-lg"

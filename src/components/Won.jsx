@@ -7,8 +7,8 @@ const Won = ({ setGameState, setdisAblehint }) => {
       <button
         className="bg-white text-green-600 font-semibold px-4 py-2 rounded-md hover:bg-green-700 hover:text-white transition"
         onClick={() => {
-          setGameState("playing");
           setdisAblehint(false);
+          setGameState("playing");
         }}
       >
         Play Again
