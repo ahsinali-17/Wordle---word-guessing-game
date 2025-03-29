@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
-import { words } from "./assets/words";
-import Line from "./components/Line";
-import GiveUp from "./components/GiveUp";
-import Won from "./components/Won";
-import Info from "./components/Info";
+import { words } from "../src/assets/words";
+import Line from "../src/components/Line";
+import GiveUp from "../src/components/GiveUp";
+import Won from "../src/components/Won";
+import Info from "../src/components/Info";
 
 function App() {
   const [guesses, setGuesses] = useState(Array(6).fill(null));
@@ -14,7 +14,7 @@ function App() {
   const [gameState, setGameState] = useState("playing");
   const [disableHint, setDisableHint] = useState(false);
   const [hintWords, setHintWords] = useState([]);
-  const msg = "Guess the word";
+  const [msg, setMsg] = useState("Guess the word");
   const [HTP, setHTP] = useState(false);
 
   useEffect(() => {
@@ -74,12 +74,25 @@ function App() {
     <div className="h-screen flex flex-col justify-around items-center font-bold uppercase overflow-hidden">
       <div className="flex justify-between w-full px-4 items-center relative">
         <h1 className="text-2xl text-center">WORDLE</h1>
-        <img onClick={()=>{setHTP(!HTP)}} className="bg-black rounded-full p-1" src={HTP?"./x.svg":"./info.svg"} alt="i" />
-        <div className={`htp ${HTP ? "block" : "hidden"} w-5/6 lg:w-1/2 absolute right-5 top-12 bg-white rounded-lg shadow-lg shadow-gray-400`}>
-          <Info/>
+        <img
+          onClick={() => {
+            setHTP(!HTP);
+          }}
+          className="bg-black rounded-full p-1"
+          src={HTP ? "./x.svg" : "./info.svg"}
+          alt="i"
+        />
+        <div
+          className={`htp ${
+            HTP ? "block" : "hidden"
+          } w-5/6 lg:w-1/2 absolute right-5 top-12 bg-white rounded-lg shadow-lg shadow-gray-400`}
+        >
+          <Info />
         </div>
       </div>
-      <p className={`${msg === "Guess the word" ? "" : "text-red-600"}`}>{msg}</p>
+      <p className={`${msg === "Guess the word" ? "" : "text-red-600"}`}>
+        {msg}
+      </p>
       <div className="flex flex-col gap-1">
         {guesses.map((guess, i) => {
           const isCurrent = i === guesses.findIndex((g) => g == null);
@@ -99,7 +112,6 @@ function App() {
       <div className="flex gap-2">
         <button
           className="px-2 py-1 border-2 border-black bg-gray-800 cursor-pointer w-[35vw] text-white font-semibold text-lg rounded-lg"
-
           onClick={() => {
             setGameState("lost");
             setGuesses(Array(6).fill(null));
@@ -122,7 +134,9 @@ function App() {
               setMsg("No more hints available...");
               setTimeout(() => setMsg("Guess the word"), 1000);
             }
-            let index = solution.split("").findIndex((letter, i) => letter !== (currentGuess[i] || ""));
+            let index = solution
+              .split("")
+              .findIndex((letter, i) => letter !== (currentGuess[i] || ""));
             if (index !== -1) {
               let tempcurrent = currentGuess.split("");
               tempcurrent[index] = solution[index];
@@ -134,11 +148,27 @@ function App() {
           Hint
         </button>
       </div>
-      <div className={`${gameState === "won" ? "fixed inset-0 flex flex-col items-center justify-center bg-green-400" : "hidden"}`}>
+      <div
+        className={`${
+          gameState === "won"
+            ? "fixed inset-0 flex flex-col items-center justify-center bg-green-400"
+            : "hidden"
+        }`}
+      >
         <Won setGameState={setGameState} setDisableHint={setDisableHint} />
       </div>
-      <div className={`${gameState === "lost" ? "fixed inset-0 flex flex-col items-center justify-center bg-gray-400" : "hidden"}`}>
-        <GiveUp solution={solution} setSolution={setSolution} setGameState={setGameState} />
+      <div
+        className={`${
+          gameState === "lost"
+            ? "fixed inset-0 flex flex-col items-center justify-center bg-gray-400"
+            : "hidden"
+        }`}
+      >
+        <GiveUp
+          solution={solution}
+          setSolution={setSolution}
+          setGameState={setGameState}
+        />
       </div>
     </div>
   );
