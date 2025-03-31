@@ -22,6 +22,59 @@ function App() {
   const spanRef = useRef(null);
 
   useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (gameState !== "playing") return;
+
+      if (e.key === "Enter") {
+        if (currentGuess.length !== 5) return;
+        if (!words.includes(currentGuess)) {
+          setMsg(`${currentGuess} not a valid word!!!`);
+          setCurrentGuess("");
+          setTimeout(() => setMsg("Guess the word"), 1000);
+          return;
+        }
+        if (currentGuess === solution) {
+          setGameState("won");
+          setGuesses(Array(6).fill(null));
+          setHintWords([]);
+          setDisableHint(false);
+          setSolution(words[Math.floor(Math.random() * words.length)]);
+          setCurrentGuess("");
+          return;
+        }
+        let index = guesses.findIndex((g) => g == null);
+        if (index === guesses.length - 1) {
+          setGameState("lost");
+          setGuesses(Array(6).fill(null));
+          setHintWords([]);
+          setDisableHint(false);
+          setCurrentGuess("");
+          return;
+        }
+        if (index === guesses.length - 3) {
+          setDisableHint(true);
+        }
+        const newGuesses = [...guesses];
+        newGuesses[index] = currentGuess;
+        setGuesses(newGuesses);
+        setCurrentGuess("");
+      }
+
+      if (e.key === "Backspace") {
+        setCurrentGuess(currentGuess.slice(0, -1));
+        return;
+      }
+
+      if (currentGuess.length === 5) return;
+
+      setCurrentGuess(currentGuess + e.key);
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [currentGuess, gameState, solution]);
+
+  useEffect(() => {
     if (HTP) {
       gsap.to(infoRef.current, {
         opacity: 1,
@@ -32,11 +85,10 @@ function App() {
       });
       gsap.to(spanRef.current, {
         opacity: 0,
-        x: 40,
+        x: 20,
         duration: 0.5,
         ease: "power2.in",
-        display : "none"
-      
+        display: "none",
       });
     } else {
       gsap.to(infoRef.current, {
@@ -44,14 +96,14 @@ function App() {
         y: -20,
         duration: 0.5,
         ease: "power2.in",
-        display: "none"
+        display: "none",
       });
       gsap.to(spanRef.current, {
         opacity: 1,
         x: 0,
         duration: 0.5,
         ease: "power2.out",
-        display: "block"
+        display: "block",
       });
     }
   }, [HTP]);
@@ -60,9 +112,18 @@ function App() {
     <div className="h-screen flex flex-col justify-around items-center font-bold uppercase overflow-hidden">
       <div className="flex justify-between w-full px-4 items-center relative">
         <h1 className="text-2xl text-center">WORDLE</h1>
-        <button className="flex items-center bg-black text-white rounded-full" onClick={() => setHTP(!HTP)}>
-          <span ref={spanRef} className='px-2'>How to play</span>
-          <img className="bg-black rounded-full p-1" src={HTP ? "./x.svg" : "./info.svg"} alt="i" />
+        <button
+          className="flex items-center"
+          onClick={() => setHTP(!HTP)}
+        >
+          <span ref={spanRef} className="p-1 bg-black text-white rounded-l-full">
+            How to play
+          </span>
+          <img
+            className="bg-black rounded-r-full p-1"
+            src={HTP ? "./x.svg" : "./info.svg"}
+            alt="i"
+          />
         </button>
         <div
           ref={infoRef}
@@ -135,13 +196,29 @@ function App() {
       </div>
 
       {/* Winning Screen */}
-      <div className={`${gameState === "won" ? "fixed inset-0 flex flex-col items-center justify-center bg-green-400" : "hidden"}`}>
+      <div
+        className={`${
+          gameState === "won"
+            ? "fixed inset-0 flex flex-col items-center justify-center bg-green-400"
+            : "hidden"
+        }`}
+      >
         <Won setGameState={setGameState} setDisableHint={setDisableHint} />
       </div>
 
       {/* Losing Screen */}
-      <div className={`${gameState === "lost" ? "fixed inset-0 flex flex-col items-center justify-center bg-gray-400" : "hidden"}`}>
-        <GiveUp solution={solution} setSolution={setSolution} setGameState={setGameState} />
+      <div
+        className={`${
+          gameState === "lost"
+            ? "fixed inset-0 flex flex-col items-center justify-center bg-gray-400"
+            : "hidden"
+        }`}
+      >
+        <GiveUp
+          solution={solution}
+          setSolution={setSolution}
+          setGameState={setGameState}
+        />
       </div>
     </div>
   );
