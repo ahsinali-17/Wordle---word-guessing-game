@@ -12,7 +12,6 @@ const Line = ({ guess, isFinal, solution, gameState, hintWords }) => {
     const newClasses = Array(5).fill("");
     const letterCount = {};
 
-    // First pass: Mark correct (green)
     for (let i = 0; i < 5; i++) {
       letterCount[solution[i]] = (letterCount[solution[i]] || 0) + 1;
     }
@@ -36,7 +35,7 @@ const Line = ({ guess, isFinal, solution, gameState, hintWords }) => {
     boxes.push(
       <div
         className={`${classes[i]} ${
-          hintWords[i] ? (hintWords[i] === char ? "text-blue-500" : "") : ""
+        hintWords.includes(char) ? "text-blue-500" : ""
         } `}
         key={i}
       >

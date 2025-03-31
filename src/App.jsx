@@ -12,7 +12,7 @@ function App() {
   );
   const [currentGuess, setCurrentGuess] = useState("");
   const [gameState, setGameState] = useState("playing");
-  const [disableHint, setDisableHint] = useState(false);
+  const [disableHint, setDisableHint] = useState(2);
   const [hintWords, setHintWords] = useState([]);
   const [msg, setMsg] = useState("Guess the word");
   const [HTP, setHTP] = useState(false);
@@ -33,7 +33,7 @@ function App() {
           setGameState("won");
           setGuesses(Array(6).fill(null));
           setHintWords([]);
-          setDisableHint(false);
+          setDisableHint(2);
           setSolution(words[Math.floor(Math.random() * words.length)]);
           setCurrentGuess("");
           return;
@@ -43,12 +43,12 @@ function App() {
           setGameState("lost");
           setGuesses(Array(6).fill(null));
           setHintWords([]);
-          setDisableHint(false);
+          setDisableHint(2);
           setCurrentGuess("");
           return;
         }
         if (index === guesses.length - 3) {
-          setDisableHint(true);
+          setDisableHint(0);
         }
         const newGuesses = [...guesses];
         newGuesses[index] = currentGuess;
@@ -108,7 +108,7 @@ function App() {
           );
         })}
       </div>
-  
+    
       <div className="flex gap-2">
         <button
           className="px-2 py-1 border-2 border-black bg-gray-800 cursor-pointer w-[35vw] text-white font-semibold text-lg rounded-lg"
@@ -117,22 +117,22 @@ function App() {
             setGuesses(Array(6).fill(null));
             setCurrentGuess("");
             setHintWords([]);
-            setDisableHint(false);
+            setDisableHint(2);
           }}
         >
           Give Up
         </button>
         <button
-          disabled={disableHint}
+          disabled={disableHint === 0}
           className="px-2 py-1 border-2 border-black bg-gray-800 cursor-pointer w-[35vw] text-white font-semibold text-lg rounded-lg disabled:bg-gray-500 disabled:cursor-not-allowed"
           onClick={() => {
-            let idx = guesses.findIndex((g) => g == null);
-            let currentguesses = guesses.slice(0, guesses.length - 1);
-            setGuesses(currentguesses);
-            if (idx === guesses.length - 2) {
-              setDisableHint(true);
+            setDisableHint((prev) => prev -1);
+            let guessNo = guesses.findIndex((g) => g == null);
+            if (disableHint === 0 || guessNo === 4) {
+              setDisableHint(0)
               setMsg("No more hints available...");
               setTimeout(() => setMsg("Guess the word"), 1000);
+              return;
             }
             let index = solution
               .split("")
@@ -145,9 +145,10 @@ function App() {
             }
           }}
         >
-          Hint
+          Hint: {disableHint}
         </button>
       </div>
+      
       <div
         className={`${
           gameState === "won"
