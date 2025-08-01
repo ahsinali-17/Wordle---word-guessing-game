@@ -21,58 +21,60 @@ function App() {
   const infoRef = useRef(null);
   const spanRef = useRef(null);
 
-  useEffect(() => {
-    const handleKeyDown = (e) => {
-      if (gameState !== "playing") return;
+  const handleInputChange = (index, value) => {
+    if (gameState !== "playing") return;
+    
+    const newCurrentGuess = currentGuess.split('');
+    newCurrentGuess[index] = value;
+    setCurrentGuess(newCurrentGuess.join('').slice(0, 5));
+  };
 
-      if (e.key === "Enter") {
-        if (currentGuess.length !== 5) return;
-        if (!words.includes(currentGuess)) {
-          setMsg(`${currentGuess} not a valid word!!!`);
-          setCurrentGuess("");
-          setTimeout(() => setMsg("Guess the word"), 1000);
-          return;
-        }
-        if (currentGuess === solution) {
-          setGameState("won");
-          setGuesses(Array(6).fill(null));
-          setHintWords([]);
-          setDisableHint(false);
-          setSolution(words[Math.floor(Math.random() * words.length)]);
-          setCurrentGuess("");
-          return;
-        }
-        let index = guesses.findIndex((g) => g == null);
-        if (index === guesses.length - 1) {
-          setGameState("lost");
-          setGuesses(Array(6).fill(null));
-          setHintWords([]);
-          setDisableHint(false);
-          setCurrentGuess("");
-          return;
-        }
-        if (index === guesses.length - 3) {
-          setDisableHint(true);
-        }
-        const newGuesses = [...guesses];
-        newGuesses[index] = currentGuess;
-        setGuesses(newGuesses);
-        setCurrentGuess("");
-      }
-
-      if (e.key === "Backspace") {
-        setCurrentGuess(currentGuess.slice(0, -1));
-        return;
-      }
-
-      if (currentGuess.length === 5) return;
-
-      setCurrentGuess(currentGuess + e.key);
-    };
-
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [currentGuess, gameState, solution]);
+  const handleSubmitGuess = () => {
+    if (gameState !== "playing") return;
+    if (currentGuess.length !== 5) return;
+    
+    if (!words.includes(currentGuess.toLowerCase())) {
+      setMsg(`${currentGuess} not a valid word!!!`);
+      
+      // Keep hint characters, clear non-hint characters
+      const newGuess = currentGuess.split('').map((char, index) => {
+        return hintWords.includes(char) ? char : '';
+      }).join('');
+      
+      setCurrentGuess(newGuess);
+      setTimeout(() => setMsg("Guess the word"), 1000);
+      return;
+    }
+    
+    if (currentGuess.toLowerCase() === solution) {
+      setGameState("won");
+      setGuesses(Array(6).fill(null));
+      setHintWords([]);
+      setDisableHint(2);
+      setSolution(words[Math.floor(Math.random() * words.length)]);
+      setCurrentGuess("");
+      return;
+    }
+    
+    let index = guesses.findIndex((g) => g == null);
+    if (index === guesses.length - 1) {
+      setGameState("lost");
+      setGuesses(Array(6).fill(null));
+      setHintWords([]);
+      setDisableHint(2);
+      setCurrentGuess("");
+      return;
+    }
+    
+    if (index === guesses.length - 3) {
+      setDisableHint(0);
+    }
+    
+    const newGuesses = [...guesses];
+    newGuesses[index] = currentGuess;
+    setGuesses(newGuesses);
+    setCurrentGuess("");
+  };
 
   useEffect(() => {
     if (HTP) {
@@ -149,6 +151,10 @@ function App() {
               solution={solution}
               gameState={gameState}
               hintWords={hintWords}
+              onInputChange={handleInputChange}
+              onSubmitGuess={handleSubmitGuess}
+              isCurrentLine={isCurrent}
+              lineIndex={i}
             />
           );
         })}
@@ -182,11 +188,11 @@ function App() {
             }
             let index = solution
               .split("")
-              .findIndex((letter, i) => letter !== (currentGuess[i] || ""));
+              .findIndex((letter, i) => letter !== (currentGuess[i] || "").toLowerCase());
             if (index !== -1) {
               let tempcurrent = currentGuess.split("");
-              tempcurrent[index] = solution[index];
-              setHintWords((prev) => [...prev, solution[index]]);
+              tempcurrent[index] = solution[index].toUpperCase();
+              setHintWords((prev) => [...prev, solution[index].toUpperCase()]);
               setCurrentGuess(tempcurrent.join(""));
             }
           }}
